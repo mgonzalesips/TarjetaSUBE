@@ -146,13 +146,23 @@ public class TarjetaTest
         Assert.That(tarjeta.Saldo, Is.EqualTo(0m));
     }
 
-    [TestCase(0)]
-    [TestCase(-100)]
-    public void DescontarSaldo_ConMontoCeroONegativo_RetornaFalseYNoModificaSaldo(decimal monto)
+    [Test]
+    public void DescontarSaldo_ConMontoCero_RetornaTrueYNoModificaSaldo()
     {
         var tarjeta = new Tarjeta(1000m);
 
-        bool resultado = tarjeta.DescontarSaldo(monto);
+        bool resultado = tarjeta.DescontarSaldo(0);
+
+        Assert.That(resultado, Is.True);
+        Assert.That(tarjeta.Saldo, Is.EqualTo(1000m));
+    }
+
+    [Test]
+    public void DescontarSaldo_ConMontoNegativo_RetornaFalseYNoModificaSaldo()
+    {
+        var tarjeta = new Tarjeta(1000m);
+
+        bool resultado = tarjeta.DescontarSaldo(-100m);
 
         Assert.That(resultado, Is.False);
         Assert.That(tarjeta.Saldo, Is.EqualTo(1000m));
