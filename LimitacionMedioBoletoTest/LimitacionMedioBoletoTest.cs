@@ -6,10 +6,11 @@ namespace LimitacionMedioBoleto
     public class LimitacionMedioBoletoTest
     {
         private TarjetaSUBEContext _db = null!;
-        private Tarjeta _tarjeta = null!;
+        private Tarjeta_tipo[] _tipos = null!;
         private Colectivo _colectivo = null!;
 
-        private const int PrecioCompleto = 1500;
+        private const int PrecioCompleto = 1580;
+        private const int PrecioMedio = PrecioCompleto / 2;
         private const int SaldoInicial = 10000;
 
         [SetUp]
@@ -22,20 +23,14 @@ namespace LimitacionMedioBoleto
             _db = new TarjetaSUBEContext(opciones);
             Contexto.Db = _db;
 
-            var tipoFranquiciaCompleta = new Tarjeta_tipo()
-            {
-                id_Tipo = 4,
-                nombre_Tipo = "Boleto educativo gratuito",
-                porcentaje_pago = 0
-            };
-
-            _db.Tarjeta_tipos.Add(tipoFranquiciaCompleta);
-            _db.SaveChanges();
-
-            _tarjeta = new Tarjeta(SaldoInicial)
-            {
-                tarjeta_tipo = tipoFranquiciaCompleta.id_Tipo
-            };
+            _tipos =
+            [
+                new Tarjeta_tipo { id_Tipo = 1, nombre_Tipo = "Tarifa general", porcentaje_pago = 100 },
+                new Tarjeta_tipo { id_Tipo = 2, nombre_Tipo = "Medio boleto estudiantil", porcentaje_pago = 50 },
+                new Tarjeta_tipo { id_Tipo = 3, nombre_Tipo = "Boleto gratuito estudiantil", porcentaje_pago = 0 },
+                new Tarjeta_tipo { id_Tipo = 4, nombre_Tipo = "Franquicia completa", porcentaje_pago = 0 }
+            ];
+            _db.Tarjeta_tipos.AddRange(_tipos);
             _db.SaveChanges();
 
             _colectivo = new Colectivo()
@@ -53,33 +48,57 @@ namespace LimitacionMedioBoleto
         }
 
         [Test]
-        public void NoSePuedenRealizarMasDeDosViajesGratisPorDia()
+        [TestCase(1, SaldoInicial - 2 * PrecioCompleto)]
+        [TestCase(2, SaldoInicial - 2 * PrecioMedio)]
+        [TestCase(3, SaldoInicial)]
+        [TestCase(4, SaldoInicial)]
+        public void CadaTipoDeTarjetaAplicaSuTarifaEnLosPrimerosDosViajes(int tipoId, int saldoEsperado)
         {
-            Assert.That(_colectivo.pagarCon(_tarjeta), Is.True);
-            Assert.That(_tarjeta.Saldo, Is.EqualTo(SaldoInicial));
+            var tarjeta = CrearTarjeta(tipoId);
 
-            Assert.That(_colectivo.pagarCon(_tarjeta), Is.True);
-            Assert.That(_tarjeta.Saldo, Is.EqualTo(SaldoInicial));
+            PagarViaje(tarjeta, tipoId);
+            PagarViaje(tarjeta, tipoId);
 
-            Assert.That(_colectivo.pagarCon(_tarjeta), Is.True);
-
-            Assert.That(_tarjeta.Saldo, Is.EqualTo(SaldoInicial - PrecioCompleto));
+            Assert.That(tarjeta.Saldo, Is.EqualTo(saldoEsperado));
         }
 
         [Test]
-        public void ViajesPosterioresAlSegundoSeCobranPrecioCompleto()
+        [TestCase(1, SaldoInicial - 4 * PrecioCompleto)]
+        [TestCase(2, SaldoInicial - 4 * PrecioMedio)]
+        [TestCase(3, SaldoInicial - 2 * PrecioCompleto)]
+        [TestCase(4, SaldoInicial)]
+        public void CadaTipoDeTarjetaAplicaSuTarifaEnLosViajesPosteriores(int tipoId, int saldoEsperado)
         {
-            Assert.That(_colectivo.pagarCon(_tarjeta), Is.True);
-            Assert.That(_colectivo.pagarCon(_tarjeta), Is.True);
+            var tarjeta = CrearTarjeta(tipoId);
 
-            Assert.That(_tarjeta.Saldo, Is.EqualTo(SaldoInicial));
+            PagarViaje(tarjeta, tipoId);
+            PagarViaje(tarjeta, tipoId);
+            PagarViaje(tarjeta, tipoId);
+            PagarViaje(tarjeta, tipoId);
 
-            Assert.That(_colectivo.pagarCon(_tarjeta), Is.True);
-            Assert.That(_tarjeta.Saldo, Is.EqualTo(SaldoInicial - PrecioCompleto));
+            Assert.That(tarjeta.Saldo, Is.EqualTo(saldoEsperado));
+        }
 
-            Assert.That(_colectivo.pagarCon(_tarjeta), Is.True);
+        private Tarjeta CrearTarjeta(int tipoId)
+        {
+            return new Tarjeta(SaldoInicial, tipoId)
+            {
+                Tipo = _tipos.Single(tipo => tipo.id_Tipo == tipoId)
+            };
+        }
 
-            Assert.That(_tarjeta.Saldo, Is.EqualTo(SaldoInicial - 2 * PrecioCompleto));
+        private void PagarViaje(Tarjeta tarjeta, int tipoId)
+        {
+            if (tipoId == 2)
+            {
+                tarjeta.fecha_ultimo_cobro = DateTime.Now.AddMinutes(-6);
+            }
+            else if (tipoId == 4)
+            {
+                tarjeta.fecha_ultimo_cobro = DateTime.Now;
+            }
+
+            Assert.That(_colectivo.pagarCon(tarjeta), Is.True);
         }
     }
 }

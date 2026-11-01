@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("LimitacionFranquiciaTest")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+e2f7bf26f0e67a41c943971aab5fe49afd64eef0")]
 [assembly: System.Reflection.AssemblyProductAttribute("LimitacionFranquiciaTest")]
 [assembly: System.Reflection.AssemblyTitleAttribute("LimitacionFranquiciaTest")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

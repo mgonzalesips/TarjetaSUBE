@@ -6,7 +6,7 @@ namespace SaldoTarjeta
     public class SaldoTarjetaTests
     {
         private TarjetaSUBEContext _db = null!;
-        private Tarjeta _tarjeta = null!;
+        private Tarjeta_tipo[] _tipos = null!;
 
         [SetUp]
         public void Setup()
@@ -17,7 +17,15 @@ namespace SaldoTarjeta
 
             _db = new TarjetaSUBEContext(opciones);
             Contexto.Db = _db;
-            _tarjeta = new Tarjeta(50000);
+            _tipos =
+            [
+                new Tarjeta_tipo { id_Tipo = 1, nombre_Tipo = "Tarifa general", porcentaje_pago = 100 },
+                new Tarjeta_tipo { id_Tipo = 2, nombre_Tipo = "Medio boleto estudiantil", porcentaje_pago = 50 },
+                new Tarjeta_tipo { id_Tipo = 3, nombre_Tipo = "Boleto gratuito estudiantil", porcentaje_pago = 0 },
+                new Tarjeta_tipo { id_Tipo = 4, nombre_Tipo = "Franquicia completa", porcentaje_pago = 0 }
+            ];
+            _db.Tarjeta_tipos.AddRange(_tipos);
+            _db.SaveChanges();
         }
 
         [TearDown]
@@ -27,32 +35,65 @@ namespace SaldoTarjeta
         }
 
         [Test]
-        public void CargarPorEncimaDelLimite_AcreditaHastaElMaximoYDejaExcedentePendiente()
+        [TestCase(1)]
+        [TestCase(2)]
+        [TestCase(3)]
+        [TestCase(4)]
+        public void CargarPorEncimaDelLimite_AcreditaHastaElMaximoYDejaExcedentePendiente(int tipoId)
         {
-            _tarjeta.Cargar(10000);
+            var tarjeta = CrearTarjeta(tipoId);
+            tarjeta.Cargar(10000);
 
-            Assert.That(_tarjeta.Saldo, Is.EqualTo(56000));
-            Assert.That(_tarjeta.Excedente, Is.EqualTo(4000));
+            Assert.That(tarjeta.Saldo, Is.EqualTo(56000));
+            Assert.That(tarjeta.Excedente, Is.EqualTo(4000));
         }
 
         [Test]
-        public void CobrarConExcedentePendiente_AcreditaHastaElMaximoDisponible()
+        [TestCase(1, 54000)]
+        [TestCase(2, 55000)]
+        [TestCase(3, 56000)]
+        [TestCase(4, 56000)]
+        public void CobrarConExcedentePendiente_AplicaLaReglaDelTipoDeTarjeta(int tipoId, int saldoEsperado)
         {
-            _tarjeta.Cargar(10000);
-            _tarjeta.Cobrar(2000);
+            var tarjeta = CrearTarjeta(tipoId);
+            tarjeta.Cargar(10000);
+            if (tipoId == 2)
+            {
+                tarjeta.fecha_ultimo_cobro = DateTime.Now.AddMinutes(-6);
+            }
+            else if (tipoId == 4)
+            {
+                tarjeta.fecha_ultimo_cobro = DateTime.Now;
+            }
+            tarjeta.Cobrar(2000);
 
-            Assert.That(_tarjeta.Saldo, Is.EqualTo(56000));
-            Assert.That(_tarjeta.Excedente, Is.EqualTo(2000));
+            Assert.That(tarjeta.Saldo, Is.EqualTo(saldoEsperado));
+            Assert.That(tarjeta.Excedente, Is.EqualTo(4000));
         }
 
-        [TestCase(-2000)]
-        [TestCase(1000)]
-        public void CargarConMontoInvalido_LanzaExcepcionSinModificarSaldo(int monto)
+        [TestCase(1, -2000)]
+        [TestCase(1, 1000)]
+        [TestCase(2, -2000)]
+        [TestCase(2, 1000)]
+        [TestCase(3, -2000)]
+        [TestCase(3, 1000)]
+        [TestCase(4, -2000)]
+        [TestCase(4, 1000)]
+        public void CargarConMontoInvalido_LanzaExcepcionSinModificarSaldo(int tipoId, int monto)
         {
-            Assert.Throws<ArgumentException>(() => _tarjeta.Cargar(monto));
+            var tarjeta = CrearTarjeta(tipoId);
+            Assert.Throws<ArgumentException>(() => tarjeta.Cargar(monto));
 
-            Assert.That(_tarjeta.Saldo, Is.EqualTo(50000));
-            Assert.That(_tarjeta.Excedente, Is.Zero);
+            Assert.That(tarjeta.Saldo, Is.EqualTo(50000));
+            Assert.That(tarjeta.Excedente, Is.Zero);
+        }
+
+        private Tarjeta CrearTarjeta(int tipoId)
+        {
+            return new Tarjeta(50000, tipoId)
+            {
+                Tipo = _tipos.Single(tipo => tipo.id_Tipo == tipoId)
+            };
         }
     }
 }

@@ -3,10 +3,11 @@
     "",
     "\\BoletoTest",
     "\\ColectivoTest",
+    "\\LimitacionFranquiciaTest",
     "\\TarjetaSUBE",
     "\\TarjetaTest",
     "\\TestProject1"
   ],
-  "SelectedNode": "\\ColectivoTest\\ColectivoTest.cs",
+  "SelectedNode": "\\LimitacionFranquiciaTest\\LimitacionFranquiciaTest.cs",
   "PreviewInSolutionExplorer": false
 }

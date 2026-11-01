@@ -9,7 +9,7 @@ namespace TarjetaSUBE
         private const int LIMITE_SUPERIOR = 56000;
         public int Saldo; //límite 40k
         public int IdTarjeta;
-        public int tarjeta_tipo;
+        public int tarjeta_tipo; // 1.Normal (100%), 2.Medio Boleto Estudiantil (50%), 3.Boleto Gratuito Estudiantil (0%), 4.Franquicia Completa (0%)
         public DateTime fecha_ultimo_cobro = DateTime.Now;
         public int CantidadViajes_Dia;
         public Tarjeta_tipo Tipo { get; set; }
