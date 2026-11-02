@@ -79,49 +79,53 @@ namespace TarjetaSUBE
             .Count();
 
             //Boleto Estudiantil Gratuito
-            if (this.Tipo.nombre_Tipo == "Boleto gratuito estudiantil")
-            {
-                if (cantidad < 2)
+            if (DateTime.Now.Hour >= 6 && DateTime.Now.Hour < 22){
+                if (this.Tipo.nombre_Tipo == "Boleto gratuito estudiantil")
                 {
-                    // no se resta nada
-                    Contexto.Db.SaveChanges();
-                    return this;
+                    if (cantidad < 2)
+                    {
+                        // no se resta nada
+                        Contexto.Db.SaveChanges();
+                        return this;
+                    }
+                    else
+                    {
+                        Saldo -= monto;
+                        Contexto.Db.SaveChanges();
+                        return this;
+                    }
                 }
-                else
+                // Boleto Franquicia Completa (Jubilados)
+                if (this.Tipo.nombre_Tipo == "Franquicia completa")
                 {
-                    Saldo -= monto;
-                    Contexto.Db.SaveChanges();
-                    return this;
+                    if (diferencia.TotalMinutes < 5)
+                    {
+                        //no se resta nada
+                        Contexto.Db.SaveChanges();
+                        return this;
+                    }
+                    else
+                    {
+                        throw new Exception("EL JUBILADO PAGO HACE MENOS DE 5 MINUTOS");
+                    }
                 }
-            }
-            // Boleto Franquicia Completa (Jubilados)
-            if (this.Tipo.nombre_Tipo == "Franquicia completa")
-            {
-                if (diferencia.TotalMinutes < 5)
-                {
-                    //no se resta nada
-                    Contexto.Db.SaveChanges();
-                    return this;
-                }
-                else
-                {
-                    throw new Exception("EL JUBILADO PAGO HACE MENOS DE 5 MINUTOS");
-                }
-            }
 
-            // Boleto Estudiantil Medio
-            if (this.Tipo.nombre_Tipo == "Medio boleto estudiantil")
-            {
-                if (diferencia.TotalMinutes < 5)
+                // Boleto Estudiantil Medio
+                if (this.Tipo.nombre_Tipo == "Medio boleto estudiantil")
                 {
-                    throw new Exception("No se puede cobrar el viaje, ya que no han pasado 5 minutos desde el último cobro de medio boleto");
+                    if (diferencia.TotalMinutes < 5)
+                    {
+                        throw new Exception("No se puede cobrar el viaje, ya que no han pasado 5 minutos desde el último cobro de medio boleto");
+                    }
+                    else
+                    {
+                        Saldo -= (monto / 2);
+                        Contexto.Db.SaveChanges();
+                        return this;
+                    }
                 }
-                else
-                {
-                    Saldo -= (monto / 2);
-                    Contexto.Db.SaveChanges();
-                    return this;
-                }
+            } else {
+                throw new Exception ("No se puede cobrar el viaje, ya que no es horario de servicio (6:00 a 22:00)");
             }
             if (Saldo - monto < -2000)
             {
