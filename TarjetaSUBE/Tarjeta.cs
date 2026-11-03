@@ -3,7 +3,6 @@ using System.Reflection.Metadata.Ecma335;
 
 namespace TarjetaSUBE
 {
-
     public class Tarjeta
     {
         private const int LIMITE_SUPERIOR = 56000;
@@ -130,23 +129,24 @@ namespace TarjetaSUBE
             }
             if(this.Tipo.nombre_Tipo == "Normal")
             {
-                if (cantidad_mes > 80)
+                if (cantidad_mes >= 79)
                 {
                     monto = monto * 75 / 100; // se aplica un 25% de descuento
-                } else if (cantidad_mes > 60)
+                } else if (cantidad_mes >= 29)
                 {
                     monto = monto * 80 / 100; // se aplica un 20% de descuento
                 }
-                if ((Saldo - monto) < -2000)
-                {
-                    throw new ArgumentException("Saldo insuficiente. El saldo no puede ser menor a -2000");
-                } 
-                else
-                {
-                    Saldo -= monto;
-                    Contexto.Db.SaveChanges();
-                    return this;
-                }
+            }
+
+            if ((Saldo - monto) < -2000)
+            {
+                throw new ArgumentException("Saldo insuficiente. El saldo no puede ser menor a -2000");
+            }
+            else
+            {
+                Saldo -= monto;
+                Contexto.Db.SaveChanges();
+                return this;
             }
         }
     }
