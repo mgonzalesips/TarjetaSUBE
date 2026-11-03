@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("BoletoFrecuenteTest")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+9536294ba172d58569c939967e37e4cebbaa75da")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+cce9b497546d1cb294fe1ca42b78e70996d22c05")]
 [assembly: System.Reflection.AssemblyProductAttribute("BoletoFrecuenteTest")]
 [assembly: System.Reflection.AssemblyTitleAttribute("BoletoFrecuenteTest")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
