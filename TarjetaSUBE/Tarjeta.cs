@@ -73,13 +73,20 @@ namespace TarjetaSUBE
 
         public Tarjeta Cobrar(int monto)
         {
-            TimeSpan diferencia = DateTime.Now - fecha_ultimo_cobro;
+            return Cobrar(monto, DateTime.Now);
+        }
+
+        public Tarjeta Cobrar(int monto, DateTime fechaActual)
+        {
+            TimeSpan diferencia = fechaActual - fecha_ultimo_cobro;
             int cantidad = Contexto.Db.Boletos
-            .Where(b => b.Tarjeta.IdTarjeta == this.IdTarjeta && b.Fecha.StartsWith(DateTime.Now.ToString("yyyy-MM-dd")))
+            .Where(b => b.Tarjeta.IdTarjeta == this.IdTarjeta && b.Fecha.StartsWith(fechaActual.ToString("yyyy-MM-dd")))
             .Count();
 
-            //Boleto Estudiantil Gratuito
-            if (DateTime.Now.Hour >= 6 && DateTime.Now.Hour < 22){
+            bool puedeAplicarBeneficio = tarjeta_tipo != 1 && fechaActual.Hour >= 6 && fechaActual.Hour < 22;
+            if (puedeAplicarBeneficio)
+            {
+                //Boleto Estudiantil Gratuito
                 if (this.Tipo.nombre_Tipo == "Boleto gratuito estudiantil")
                 {
                     if (cantidad < 2)
@@ -95,6 +102,7 @@ namespace TarjetaSUBE
                         return this;
                     }
                 }
+
                 // Boleto Franquicia Completa (Jubilados)
                 if (this.Tipo.nombre_Tipo == "Franquicia completa")
                 {
@@ -124,9 +132,8 @@ namespace TarjetaSUBE
                         return this;
                     }
                 }
-            } else {
-                throw new Exception ("No se puede cobrar el viaje, ya que no es horario de servicio (6:00 a 22:00)");
             }
+
             if (Saldo - monto < -2000)
             {
                 throw new ArgumentException("El saldo no puede ser menor a -2000");

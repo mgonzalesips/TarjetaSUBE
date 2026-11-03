@@ -3,11 +3,13 @@
     "",
     "\\BoletoTest",
     "\\ColectivoTest",
+    "\\HorarioFranquiciaTest",
     "\\LimitacionFranquiciaTest",
+    "\\SaldoTarjetaTest",
     "\\TarjetaSUBE",
     "\\TarjetaTest",
     "\\TestProject1"
   ],
-  "SelectedNode": "\\TarjetaSUBE\\Tarjeta.cs",
+  "SelectedNode": "\\TarjetaSUBE.slnx",
   "PreviewInSolutionExplorer": false
 }
