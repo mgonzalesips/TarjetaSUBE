@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("ColectivoTest")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Release")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+2260d43be54c1647505d54130535aed76da0ad10")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+68dc930d319c813204d9871756e3ec8a5b603c20")]
 [assembly: System.Reflection.AssemblyProductAttribute("ColectivoTest")]
 [assembly: System.Reflection.AssemblyTitleAttribute("ColectivoTest")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

@@ -1,4 +1,5 @@
 <Solution>
+  <Project Path="BoletoFrecuenteTest/BoletoFrecuenteTest.csproj" Id="c992e249-82a8-4e6c-8781-55a9c964a7e7" />
   <Project Path="BoletoTest/BoletoTest.csproj" Id="bdfdcfcd-a4e7-4205-8b5d-516d0e2c7714" />
   <Project Path="ColectivoTest/ColectivoTest.csproj" Id="9c0f0248-1a91-4dfb-8a75-80df10fc8234" />
   <Project Path="DatosBoletoTest/DatosBoletoTest.csproj" Id="fb083e67-584d-44b1-9574-b6104a742941" />
