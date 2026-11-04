@@ -3,7 +3,6 @@ using System.Reflection.Metadata.Ecma335;
 
 namespace TarjetaSUBE
 {
-
     public class Tarjeta
     {
         private const int LIMITE_SUPERIOR = 56000;
@@ -77,6 +76,9 @@ namespace TarjetaSUBE
             int cantidad = Contexto.Db.Boletos
             .Where(b => b.Tarjeta.IdTarjeta == this.IdTarjeta && b.Fecha.StartsWith(DateTime.Now.ToString("yyyy-MM-dd")))
             .Count();
+            int cantidad_mes = Contexto.Db.Boletos
+            .Where(b => b.Tarjeta.IdTarjeta == this.IdTarjeta && b.Fecha.StartsWith(DateTime.Now.ToString("yyyy-MM")))
+            .Count();
 
             //Boleto Estudiantil Gratuito
             if (this.Tipo.nombre_Tipo == "Boleto gratuito estudiantil")
@@ -87,8 +89,10 @@ namespace TarjetaSUBE
                     Contexto.Db.SaveChanges();
                     return this;
                 }
-                else
-                {
+                else if(Saldo - monto < -2000){
+                    throw new ArgumentException("El saldo no puede ser menor a -2000");
+                }
+                else{
                     Saldo -= monto;
                     Contexto.Db.SaveChanges();
                     return this;
@@ -123,9 +127,20 @@ namespace TarjetaSUBE
                     return this;
                 }
             }
-            if (Saldo - monto < -2000)
+            if(this.Tipo.nombre_Tipo == "Normal")
             {
-                throw new ArgumentException("El saldo no puede ser menor a -2000");
+                if (cantidad_mes >= 79)
+                {
+                    monto = monto * 75 / 100; // se aplica un 25% de descuento
+                } else if (cantidad_mes >= 29)
+                {
+                    monto = monto * 80 / 100; // se aplica un 20% de descuento
+                }
+            }
+
+            if ((Saldo - monto) < -2000)
+            {
+                throw new ArgumentException("Saldo insuficiente. El saldo no puede ser menor a -2000");
             }
             else
             {
@@ -136,5 +151,3 @@ namespace TarjetaSUBE
         }
     }
 }
-
-
