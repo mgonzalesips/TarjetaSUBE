@@ -18,7 +18,7 @@ namespace TarjetaSUBE
             Fecha = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
             Tarjeta = tarjeta;
             Colectivo = colectivo;
-            Monto = 1580;
+            Monto = 2150;
             tarjeta.Cobrar(this.Monto);
             SaldoRestante = tarjeta.Saldo;
             Contexto.Db.Boletos.Add(this);
